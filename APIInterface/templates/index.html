@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+
+h3 {
+  color: SteelBlue  ;
+}
+
+th, td {
+  padding: 5px;
+
+}
+table th {
+  width: 30%;    
+  background-color: PaleTurquoise;
+}
+
+</style>
+</head>
+<body>
+
+<h3 align="center">WEATHER FORECAST</h3>
+
+<label for="date">DATE:</label>
+<input type="number" id="date" min="20130101" max="99991231" required>
+<button id="button" onclick="core()">GET DATA</button>
+
+<div id="demo"></div>
+
+<script>
+
+function core() {
+  var date_obj = document.getElementById("date");
+  if (!date_obj.checkValidity()) {
+    document.getElementById("demo").innerHTML = date_obj.validationMessage;
+  } 
+  else {
+    var x, txt = "";
+    var url = '/forecast/'+date_obj.value;
+    var ourRequest = new XMLHttpRequest();
+    ourRequest.open('GET', url); 
+    ourRequest.onload = function(){
+        var ourData = JSON.parse(ourRequest.responseText);
+        txt += "<table style='width:50%' id='t01'><tr><th>DATE</th><th>TMAX</th><th>TMIN</th></tr>";
+        for (x = 0; x < 6; x++) {
+            txt += "<tr><td>"+ourData[x].DATE+"</td><td>"+ourData[x].TMAX+"</td><td>"+ourData[x].TMIN+"</td></tr>";
+        }
+        txt += "</table>"
+        document.getElementById("demo").innerHTML = txt
+        };
+    ourRequest.send();
+  } 
+}
+    
+</script>
+
+</body>
+</html>
