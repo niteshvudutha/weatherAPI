@@ -1,0 +1,9 @@
+install virtualenv: pip install virtualenv
+create a virtual_env: virtualenv env_name
+Launch Environment:  env_name\Scripts\activate
+// python environment is activated
+move to project directory and run: pip install requirements.txt
+install swagger: pip install django-rest-swagger
+python manage.py runserver
+// to dectivate environment
+deactivate
