@@ -2,56 +2,75 @@
 <html>
 <head>
 <style>
-
-h3 {
-  color: SteelBlue  ;
-}
-
 th, td {
-  padding: 5px;
+  padding: 15px;
+  text-align: center;
 
 }
-table th {
-  width: 30%;    
-  background-color: PaleTurquoise;
+table th {   
+  background-color: #ccc;
+  font-weight: bold;
+}
+
+.table-style td {
+border:1px solid #000;
 }
 
 </style>
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 </head>
 <body>
+<h4>Homework #3: Upgrade UI to Dynamic Using Service API</h4>
 
-<h3 align="center">WEATHER FORECAST</h3>
-
-<label for="date">DATE:</label>
-<input type="number" id="date" min="20130101" max="99991231" required>
-<button id="button" onclick="core()">GET DATA</button>
-
-<div id="demo"></div>
-
+<label for="dateselector">Select Date from input Calendar <input type="text" id="dateselector"></p>
+<div id="weather-data"></div>
 <script>
 
-function core() {
-  var date_obj = document.getElementById("date");
-  if (!date_obj.checkValidity()) {
-    document.getElementById("demo").innerHTML = date_obj.validationMessage;
-  } 
-  else {
-    var x, txt = "";
-    var url = '/forecast/'+date_obj.value;
-    var ourRequest = new XMLHttpRequest();
-    ourRequest.open('GET', url); 
-    ourRequest.onload = function(){
-        var ourData = JSON.parse(ourRequest.responseText);
-        txt += "<table style='width:50%' id='t01'><tr><th>DATE</th><th>TMAX</th><th>TMIN</th></tr>";
-        for (x = 0; x < 6; x++) {
-            txt += "<tr><td>"+ourData[x].DATE+"</td><td>"+ourData[x].TMAX+"</td><td>"+ourData[x].TMIN+"</td></tr>";
+$(function(){
+  $( "#dateselector" ).datepicker({
+		changeMonth: true,
+		changeYear: true,
+		numberOfMonths: 3,
+		showButtonPanel: true,
+		minDate: new Date(2013,0,01),
+		maxDate: new Date(2019,2,27)
+	});
+
+  $("#dateselector").change(function(){
+    console.log('datge change ',$(this).val())
+    var val = $(this).val();
+    if(val.length ==0)
+    {
+      alert('Please Select Some Date');
+    }
+    else if(val.length > 10)
+    {
+      alert('Please Select Proper Date');
+    }
+    else{
+      var date, rq, htm, url;
+
+      date = val.substring(6,10) + val.substring(0,2) + val.substring(3,5);
+	  url = '/forecast/'+date;
+	  rq = new XMLHttpRequest();
+      rq.open('GET', url); 
+	  
+	  htm = "<table class='table-style'><tr><th>DATE</th><th>TMIN</th><th>TMAX</th></tr>";
+      rq.onload = function(){
+        var res = JSON.parse(rq.responseText);
+        
+        for (i = 0; i < 6; i++) {
+            htm += "<tr><td>"+res[i].DATE+"</td><td>"+res[i].TMIN+"</td><td>"+res[i].TMAX+"</td></tr>";
         }
-        txt += "</table>"
-        document.getElementById("demo").innerHTML = txt
-        };
-    ourRequest.send();
-  } 
-}
+        htm += "</table>";
+		$("#weather-data").html(htm);
+      };
+	  rq.send();
+    }
+  });
+});
     
 </script>
 
