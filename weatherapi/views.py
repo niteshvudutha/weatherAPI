@@ -50,19 +50,24 @@ class ForecastViewSet(viewsets.GenericViewSet):
 			currDate = (startDate + timedelta(days = i)).strftime("%Y%m%d")
 			serializer = self.get_serializer(WeatherAPI.objects.all().filter(DATE = currDate), many = True)
 			if len(serializer.data)==0:
-				j = 1
+				j = int(currDate[:4])
 				TMAX = 0
 				TMIN = 0
-				while j < 4:
-					prDate = datetime(int(currDate[:4])-1, int(currDate[4:6]), int(currDate[6:])).strftime("%Y%m%d")
+
+				while j >= 2013:
+					prDate = datetime(j, int(currDate[4:6]), int(currDate[6:])).strftime("%Y%m%d")
 					serializer = self.get_serializer(WeatherAPI.objects.all().filter(DATE = prDate), many = True)
-					if len(serializer.data) == 0:
-						TMAX = TMAX + round(random.uniform(50, 100), 2)
-						TMIN = TMIN + round(random.uniform(2, 50), 2)
-					else:
-						TMAX = TMAX + serializer.data[0]["TMAX"]
-						TMIN = TMIN + serializer.data[0]["TMIN"]
-					j = j + 1
+					prDate1 = datetime(j-1, int(currDate[4:6]), int(currDate[6:])).strftime("%Y%m%d")
+					serializer1 = self.get_serializer(WeatherAPI.objects.all().filter(DATE = prDate), many = True)
+					if len(serializer.data) != 0:
+						TMAX0 = TMAX + serializer.data[0]["TMAX"]
+						TMIN0 = TMIN + serializer.data[0]["TMIN"]
+						TMAX1 = TMAX + serializer1.data[0]["TMAX"]
+						TMIN1 = TMIN + serializer1.data[0]["TMIN"]
+						TMAX = (TMAX0+TMAX1)/2
+						TMIN = (TMIN0+TMIN1)/2
+						break
+					j = j -1
 				newdata ={"DATE" : currDate, "TMAX" : round(TMAX/3,2), "TMIN" : round(TMIN/3,2)} 
 				response.append(newdata)
 			else:
